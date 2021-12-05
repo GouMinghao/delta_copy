@@ -1,5 +1,7 @@
 # delta_copy
-delta copy for file backup
+A simple python tool for delta copy from one directory to another. Only addition file will be copied, other files will be skipped.
+
+This tool is helpful in cases such as doing file backup.
 
 ## Installation
 ```bash
