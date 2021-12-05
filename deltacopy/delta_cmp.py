@@ -1,3 +1,4 @@
+from datetime import datetime
 import os
 from .logging import Logger
 logger = Logger('delta_cmp')
@@ -15,8 +16,52 @@ class DeltaComparer():
             self.dst_flag = False
         else:
             self.dst_flag = True
-    def compare(self):
+        self.missing_record_list = []
+        self.log_name = "compare_result_{}.txt".format(datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
+        if os.path.exists(self.log_name):
+            logger.logwarning("log file {} already exists".format(self.log_name))
+            input_flag = True
+            continue_flag = False
+            while input_flag:
+                input_char = input('continue? (y/n):').lower
+                if input_char == 'y':
+                    input_flag = False
+                    continue_flag = True
+                elif input_char == 'n':
+                    input_flag = False
+            if not continue_flag:
+                raise ValueError('User aborts the task')
+        self.log_file = open(self.log_name, 'w')
+        self.log_file.write("=== delta cmp record ===\nsrc:{}\ndst:{}\n======\n".format(self.src, self.dst))
+
+    def compare(self, write_record = True):
         if not self.src_flag or not self.dst_flag:
             logger.logerror("src or dst doesn't exist")
             raise ValueError("src or dst doesn't exist")
-        
+        self._dfs([self.src], [self.dst], write_record = write_record)
+
+    def _dfs(self, cur_src_list, cur_dst_list, write_record = True):
+        logger.logdebug("Visiting {}".format(os.path.join(*cur_dst_list)))
+        if not os.path.exists(os.path.join(*cur_dst_list)):
+            logger.logdebug("{} missing".format(os.path.join(*cur_dst_list)))
+            self.missing_record_list.append((
+                os.path.join(*cur_src_list),
+                os.path.join(*cur_dst_list)
+            ))
+            if write_record:
+                self.log_file.write("{}, {}\n".format(
+                    os.path.join(*cur_src_list),
+                    os.path.join(*cur_dst_list)
+                ))
+            
+        elif os.path.isdir(os.path.join(*cur_dst_list)):
+            try:
+                files = os.listdir(os.path.join(*cur_src_list))
+                for file in files:
+                    cur_src_list.append(file)
+                    cur_dst_list.append(file)
+                    self._dfs(cur_src_list, cur_dst_list)
+                    cur_src_list.pop()
+                    cur_dst_list.pop()
+            except PermissionError:
+                logger.logwarning("Cannot visit {}".format(os.path.join(*cur_src_list)))

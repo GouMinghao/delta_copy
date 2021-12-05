@@ -1,6 +1,7 @@
 from datetime import datetime
 
 COLOR_ENCODE_DICT = {
+    'white': '\033[0m',
     'black': '\033[030m',
     'red': '\033[031m',
     'green': '\033[032m',
@@ -12,8 +13,8 @@ COLOR_ENCODE_DICT = {
 END_ENCODE = '\033[0m'
 
 DEFAULT_COLOR_DICT = {
-    'debug': 'write',
-    'info': 'write',
+    'debug': 'white',
+    'info': 'white',
     'warning': 'yellow',
     'error': 'red'
 }
