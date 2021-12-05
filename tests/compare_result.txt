@@ -1,0 +1,7 @@
+# === delta cmp record === #
+# src:dir1 #
+# dst:dir2 #
+# ====== #
+dir1\d1\file2, dir2\d1\file2
+dir1\d2, dir2\d2
+dir1\file6, dir2\file6

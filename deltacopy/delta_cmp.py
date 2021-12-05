@@ -1,7 +1,9 @@
 from datetime import datetime
 import os
 from .logging import Logger
+
 logger = Logger('delta_cmp')
+
 class DeltaComparer():
     def __init__(self, src, dst):
         self.src = src
@@ -20,19 +22,18 @@ class DeltaComparer():
         self.log_name = "compare_result_{}.txt".format(datetime.now().strftime("%Y-%m-%d-%H-%M-%S"))
         if os.path.exists(self.log_name):
             logger.logwarning("log file {} already exists".format(self.log_name))
-            input_flag = True
             continue_flag = False
-            while input_flag:
-                input_char = input('continue? (y/n):').lower
+            while True:
+                input_char = input('continue? (y/n):').strip().lower()
                 if input_char == 'y':
-                    input_flag = False
                     continue_flag = True
+                    break
                 elif input_char == 'n':
-                    input_flag = False
+                    break
             if not continue_flag:
                 raise ValueError('User aborts the task')
         self.log_file = open(self.log_name, 'w')
-        self.log_file.write("=== delta cmp record ===\nsrc:{}\ndst:{}\n======\n".format(self.src, self.dst))
+        self.log_file.write("# === delta cmp record === #\n# src:{} #\n# dst:{} #\n# ====== #\n".format(self.src, self.dst))
 
     def compare(self, write_record = True):
         if not self.src_flag or not self.dst_flag:

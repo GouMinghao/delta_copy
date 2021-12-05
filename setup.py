@@ -35,5 +35,5 @@ setup(
 
         keywords="delta copy",
 
-        install_requires=[],
+        install_requires=["tqdm"],
 )
